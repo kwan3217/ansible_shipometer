@@ -1,0 +1,53 @@
+---
+- name: Install chrony and disable conflicting time services
+  apt:
+    name: chrony
+    state: present
+  tags: chrony
+
+# Seems like installing chrony does this
+- name: Stop and disable systemd-timesyncd (default NTP on Pi OS)
+  systemd:
+    name: systemd-timesyncd
+    state: stopped
+    enabled: no
+    masked: yes   # prevents accidental re-enable
+  ignore_errors: yes
+  tags: chrony
+
+- name: Configure chrony with GPS NMEA + PPS refclocks
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+  tags: chrony
+
+- name: Enable and start chrony
+  systemd:
+    name: chrony
+    state: started
+    enabled: yes
+  tags: chrony
+
+- name: Ensure dialout group exists (for serial/PPS access)
+  group:
+    name: dialout
+    state: present
+  tags: chrony
+
+- name: Set /dev/pps* permissions via udev rule (group dialout, readable)
+  ansible.builtin.copy:
+    dest: /etc/udev/rules.d/99-pps.rules
+    content: |
+      KERNEL=="pps*", SUBSYSTEM=="pps", GROUP="dialout", MODE="0660"
+    mode: "0644"
+  tags: chrony
+
+- name: Add _chrony user to dialout group for direct PPS access
+  user:
+    name: _chrony
+    groups: dialout
+    append: yes
+  tags: chrony

@@ -1,0 +1,4 @@
+---
+dependencies:
+  - role: gpsd
+    tags: gpsd
