@@ -1,0 +1,8 @@
+- name: Restart gpsd
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - gpsd.socket
+    - gpsd.service
+    
