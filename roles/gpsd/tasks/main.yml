@@ -41,6 +41,9 @@
       ListenStream=[::]:2947         # and setting listen on any ipv6 address 
       SocketMode=0666
     marker: "# {mark} ANSIBLE MANAGED BLOCK - gpsd network access"
+  notify:
+    - Daemon reload
+    - Restart gpsd
   tags: gpsd
 
 - name: Set /dev/pps* permissions via udev rule (group dialout, readable)
