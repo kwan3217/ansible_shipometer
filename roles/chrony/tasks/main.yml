@@ -31,20 +31,6 @@
     enabled: yes
   tags: chrony
 
-- name: Ensure dialout group exists (for serial/PPS access)
-  group:
-    name: dialout
-    state: present
-  tags: chrony
-
-- name: Set /dev/pps* permissions via udev rule (group dialout, readable)
-  ansible.builtin.copy:
-    dest: /etc/udev/rules.d/99-pps.rules
-    content: |
-      KERNEL=="pps*", SUBSYSTEM=="pps", GROUP="dialout", MODE="0660"
-    mode: "0644"
-  tags: chrony
-
 - name: Add _chrony user to dialout group for direct PPS access
   user:
     name: _chrony
