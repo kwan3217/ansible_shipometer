@@ -29,4 +29,4 @@
   apt:
     name: pps-tools
     state: present
-  tags: gps_pps
+  tags: pps
