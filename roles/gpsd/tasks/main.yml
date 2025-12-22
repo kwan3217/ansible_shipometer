@@ -1,4 +1,15 @@
 ---
+- name: Ensure UART overlay is configured in /boot/firmware/config.txt
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/config.txt
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: EOF
+  loop:
+    - { regexp: '^#?dtoverlay=uart2-pi5', line: 'dtoverlay=uart2-pi5' }
+  notify: Reboot required
+  tags: gpsd
+
 - name: Install gpsd and clients
   apt:
     name:
