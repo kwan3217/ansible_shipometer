@@ -32,3 +32,21 @@
       APT::Periodic::Unattended-Upgrade "1";
       APT::Periodic::AutocleanInterval "7";
     mode: "0644"
+
+- name: Restore original SSH host keys (ignores host key verification during this run)
+  ansible.builtin.copy:
+    src: "{{ ssh_host_keys_backup_dir }}/{{ item }}"
+    dest: "/etc/ssh/{{ item }}"
+    owner: root
+    group: root
+    mode: "{{ '0600' if 'key' in item else '0644' }}"
+  loop:
+    - ssh_host_ed25519_key
+    - ssh_host_ed25519_key.pub
+    - ssh_host_rsa_key
+    - ssh_host_rsa_key.pub
+    - ssh_host_ecdsa_key
+    - ssh_host_ecdsa_key.pub
+  notify: Restart sshd
+  tags: common
+
